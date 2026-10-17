@@ -45,7 +45,7 @@ O formulário deve ser organizado em 3 abas: Pessoal, Clínico e Hábitos.
 
 ## Regras importantes
 - O único campo obrigatório é o nome completo
-- Ao salvar, vincular o paciente ao nutricionista logado via nutricionista_id
+- Ao salvar, vincular o paciente a o nutricionista logado via nutricionista_id
 - Após salvar, redirecionar para o perfil do paciente recém cadastrado
 - Exibir mensagem de sucesso ao salvar
 

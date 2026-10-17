@@ -310,15 +310,15 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-nutri-700 mb-2 transition"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-nutri-700 dark:hover:text-nutri-400 mb-2 transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar para pacientes</span>
           </button>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
             Novo Paciente
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Preencha os dados do paciente para iniciar o acompanhamento clínico
           </p>
         </div>
@@ -326,28 +326,28 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
 
       {/* Alertas */}
       {errorMsg && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 text-sm flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 shrink-0 text-rose-600 dark:text-rose-400" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
+        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200 text-sm flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Navegação por Abas */}
-      <div className="bg-white rounded-3xl p-2 border border-slate-200/80 shadow-xs flex flex-wrap gap-1 sm:gap-2">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-2 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-wrap gap-1 sm:gap-2">
         <button
           type="button"
           onClick={() => setActiveTab('pessoal')}
           className={`flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2.5 transition duration-150 ${
             activeTab === 'pessoal'
               ? 'bg-nutri-600 text-white shadow-sm shadow-nutri-600/30'
-              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
           <User className="w-4 h-4" />
@@ -360,7 +360,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
           className={`flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2.5 transition duration-150 ${
             activeTab === 'clinico'
               ? 'bg-nutri-600 text-white shadow-sm shadow-nutri-600/30'
-              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -373,7 +373,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
           className={`flex-1 min-w-[120px] py-3 px-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2.5 transition duration-150 ${
             activeTab === 'habitos'
               ? 'bg-nutri-600 text-white shadow-sm shadow-nutri-600/30'
-              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
           <Coffee className="w-4 h-4" />
@@ -382,13 +382,13 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
       </div>
 
       {/* Formulário Principal */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-6">
         {/* ================= ABA 1: PESSOAL ================= */}
         {activeTab === 'pessoal' && (
           <div className="space-y-6 animate-fadeIn">
             <div>
-              <h2 className="text-lg font-bold text-slate-800">Dados Pessoais</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Dados Pessoais</h2>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                 Informações de contato e identificação do paciente
               </p>
             </div>
@@ -396,7 +396,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Nome completo (obrigatório) */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Nome Completo <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -405,13 +405,13 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                   placeholder="Ex: Mariana Silva Souza"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Data de Nascimento com cálculo automático de idade */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Data de Nascimento
                 </label>
                 <div className="flex gap-2 items-center">
@@ -419,10 +419,10 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                     type="date"
                     value={dataNascimento}
                     onChange={(e) => setDataNascimento(e.target.value)}
-                    className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
+                    className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
                   />
                   {idadeCalculada !== null && (
-                    <span className="shrink-0 px-3 py-3 bg-nutri-50 text-nutri-800 border border-nutri-200 rounded-xl text-xs font-bold">
+                    <span className="shrink-0 px-3 py-3 bg-nutri-50 dark:bg-nutri-950/60 text-nutri-800 dark:text-nutri-300 border border-nutri-200 dark:border-nutri-800 rounded-xl text-xs font-bold">
                       {idadeCalculada} anos
                     </span>
                   )}
@@ -431,7 +431,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
 
               {/* Sexo (seleção única) */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Sexo
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -442,8 +442,8 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                       onClick={() => setSexo(s)}
                       className={`py-3 px-2 rounded-xl text-xs font-bold border transition ${
                         sexo === s
-                          ? 'bg-nutri-50 border-nutri-500 text-nutri-700 shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/70'
+                          ? 'bg-nutri-50 dark:bg-nutri-950/60 border-nutri-500 text-nutri-700 dark:text-nutri-300 shadow-xs'
+                          : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
                       {s}
@@ -454,7 +454,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
 
               {/* Telefone */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   Telefone
                 </label>
                 <input
@@ -462,13 +462,13 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                   placeholder="(00) 0000-0000"
                   value={telefone}
                   onChange={(e) => setTelefone(formatPhone(e.target.value))}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* WhatsApp */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   WhatsApp
                 </label>
                 <input
@@ -476,13 +476,13 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                   placeholder="(00) 00000-0000"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(formatPhone(e.target.value))}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* E-mail */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                   E-mail
                 </label>
                 <input
@@ -490,7 +490,7 @@ export const NovoPacienteForm: React.FC<NovoPacienteFormProps> = ({
                   placeholder="paciente@exemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-nutri-500/30 focus:border-nutri-600 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>

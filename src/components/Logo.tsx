@@ -79,10 +79,10 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
         <NutritionEmblemWhite className={emblemSizes[size]} />
       </div>
       <div className="flex flex-col">
-        <span className={`font-bold tracking-tight text-slate-800 ${textSizes[size]}`}>
-          Nutri<span className="text-nutri-600">full</span>
+        <span className={`font-bold tracking-tight text-slate-800 dark:text-slate-100 ${textSizes[size]}`}>
+          Nutri<span className="text-nutri-600 dark:text-nutri-400">full</span>
         </span>
-        <span className="text-[10px] tracking-wider uppercase font-semibold text-slate-400 -mt-1">
+        <span className="text-[10px] tracking-wider uppercase font-semibold text-slate-400 dark:text-slate-400 -mt-1">
           Gestão Nutricional
         </span>
       </div>

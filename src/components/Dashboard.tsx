@@ -38,7 +38,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 flex">
+    <div className="min-h-screen bg-slate-50/70 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex transition-colors duration-200">
       {/* Menu Lateral Fixo com opções Dashboard e Pacientes e Logo Nutrifull */}
       <Sidebar
         currentTab={currentTab}
