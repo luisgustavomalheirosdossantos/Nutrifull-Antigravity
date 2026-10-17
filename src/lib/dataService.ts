@@ -18,9 +18,57 @@ export interface Paciente {
   nutricionista_id: string;
   nome: string;
   telefone?: string;
+  whatsapp?: string;
   email?: string;
   data_nascimento?: string;
+  sexo?: string;
+  peso_inicial?: number;
+  altura?: number;
+  objetivos?: string[];
+  objetivo_texto?: string;
+  nivel_atividade?: string;
+  patologias?: string[];
+  restricoes_alimentares?: string[];
+  alergias?: string[];
+  medicamentos?: string;
+  suplementos?: string;
+  refeicoes_por_dia?: number;
+  horario_acorda?: string;
+  horario_dorme?: string;
+  litros_agua?: number;
+  atividade_fisica?: boolean;
+  atividade_fisica_descricao?: string;
+  observacoes?: string;
   created_at?: string;
+  // Campos calculados/agregados na listagem
+  ultima_consulta?: string;
+  objetivo_display?: string;
+}
+
+export interface NovoPacientePayload {
+  nome: string;
+  data_nascimento?: string;
+  sexo?: string;
+  telefone?: string;
+  whatsapp?: string;
+  email?: string;
+  peso_inicial?: number;
+  altura?: number;
+  objetivos?: string[];
+  objetivo_texto?: string;
+  nivel_atividade?: string;
+  patologias?: string[];
+  restricoes_alimentares?: string[];
+  alergias?: string[];
+  medicamentos?: string;
+  suplementos?: string;
+  refeicoes_por_dia?: number;
+  horario_acorda?: string;
+  horario_dorme?: string;
+  litros_agua?: number;
+  atividade_fisica?: boolean;
+  atividade_fisica_descricao?: string;
+  observacoes?: string;
 }
 
 export const neonDataService = {
@@ -31,10 +79,8 @@ export const neonDataService = {
     return neon(databaseUrl);
   },
 
-  async getDashboardData(nutricionistaId: string, email?: string): Promise<DashboardMetrics> {
+  async resolveNutricionistaId(nutricionistaId: string, email?: string): Promise<string> {
     const sql = this.getSql();
-
-    // Resolver ID do nutricionista a partir do email se necessário
     let resolvedNutriId = nutricionistaId;
     if (email) {
       try {
@@ -48,6 +94,12 @@ export const neonDataService = {
         console.warn('Erro ao consultar id do nutricionista por email:', err);
       }
     }
+    return resolvedNutriId;
+  },
+
+  async getDashboardData(nutricionistaId: string, email?: string): Promise<DashboardMetrics> {
+    const sql = this.getSql();
+    const resolvedNutriId = await this.resolveNutricionistaId(nutricionistaId, email);
 
     try {
       // 1. Total de pacientes cadastrados pela nutricionista logada
@@ -58,7 +110,7 @@ export const neonDataService = {
       `;
       const totalPacientes = totalPacientesRes[0]?.total || 0;
 
-      // 2. Consultas registradas na semana atual (segunda a domingo ou últimos 7 dias)
+      // 2. Consultas registradas na semana atual
       const consultasSemanaRes = await sql`
         SELECT COUNT(*)::int as total
         FROM public.consultas c
@@ -69,8 +121,7 @@ export const neonDataService = {
       `;
       const consultasSemana = consultasSemanaRes[0]?.total || 0;
 
-      // 3. Pacientes sem retorno:
-      // Última consulta foi há mais de 30 dias e não possuem próximo retorno agendado (ou próximo_retorno é NULL / no passado)
+      // 3. Pacientes sem retorno (> 30 dias sem retorno agendado)
       const semRetornoRes = await sql`
         WITH ultimas_consultas AS (
           SELECT 
@@ -119,61 +170,159 @@ export const neonDataService = {
 
   async getPacientes(nutricionistaId: string, email?: string): Promise<Paciente[]> {
     const sql = this.getSql();
-    let resolvedNutriId = nutricionistaId;
-    if (email) {
-      try {
-        const nutriRows = await sql`
-          SELECT id FROM public.nutricionistas WHERE email = ${email} OR id = ${nutricionistaId} LIMIT 1;
-        `;
-        if (nutriRows.length > 0) {
-          resolvedNutriId = nutriRows[0].id;
-        }
-      } catch (err) {
-        console.warn('Erro ao consultar id do nutricionista:', err);
-      }
-    }
+    const resolvedNutriId = await this.resolveNutricionistaId(nutricionistaId, email);
 
     try {
       const rows = await sql`
-        SELECT id, nutricionista_id, nome, telefone, email, data_nascimento, created_at
-        FROM public.pacientes
-        WHERE nutricionista_id = ${resolvedNutriId}
-        ORDER BY nome ASC;
+        SELECT 
+          p.*,
+          (
+            SELECT MAX(c.data_consulta)
+            FROM public.consultas c
+            WHERE c.paciente_id = p.id
+          ) as ultima_consulta
+        FROM public.pacientes p
+        WHERE p.nutricionista_id = ${resolvedNutriId}
+        ORDER BY p.nome ASC;
       `;
-      return rows as Paciente[];
+
+      return rows.map((r: any) => {
+        // Obter resumo de objetivo para exibição
+        let objetivo_display = 'Não especificado';
+        if (r.objetivos && Array.isArray(r.objetivos) && r.objetivos.length > 0) {
+          objetivo_display = r.objetivos.join(', ');
+          if (r.objetivo_texto) {
+            objetivo_display += ` (${r.objetivo_texto})`;
+          }
+        } else if (r.objetivo_texto) {
+          objetivo_display = r.objetivo_texto;
+        }
+
+        return {
+          ...r,
+          peso_inicial: r.peso_inicial ? Number(r.peso_inicial) : undefined,
+          altura: r.altura ? Number(r.altura) : undefined,
+          litros_agua: r.litros_agua ? Number(r.litros_agua) : undefined,
+          objetivo_display,
+          ultima_consulta: r.ultima_consulta ? new Date(r.ultima_consulta).toLocaleDateString('pt-BR') : undefined,
+        };
+      }) as Paciente[];
     } catch (err) {
       console.error('Erro ao listar pacientes no Neon:', err);
       return [];
     }
   },
 
+  async cadastrarPaciente(
+    nutricionistaId: string,
+    emailNutri: string | undefined,
+    dados: NovoPacientePayload
+  ): Promise<Paciente> {
+    const sql = this.getSql();
+    const resolvedNutriId = await this.resolveNutricionistaId(nutricionistaId, emailNutri);
+
+    const rows = await sql`
+      INSERT INTO public.pacientes (
+        nutricionista_id,
+        nome,
+        data_nascimento,
+        sexo,
+        telefone,
+        whatsapp,
+        email,
+        peso_inicial,
+        altura,
+        objetivos,
+        objetivo_texto,
+        nivel_atividade,
+        patologias,
+        restricoes_alimentares,
+        alergias,
+        medicamentos,
+        suplementos,
+        refeicoes_por_dia,
+        horario_acorda,
+        horario_dorme,
+        litros_agua,
+        atividade_fisica,
+        atividade_fisica_descricao,
+        observacoes
+      )
+      VALUES (
+        ${resolvedNutriId},
+        ${dados.nome.trim()},
+        ${dados.data_nascimento || null},
+        ${dados.sexo || null},
+        ${dados.telefone || null},
+        ${dados.whatsapp || null},
+        ${dados.email || null},
+        ${dados.peso_inicial !== undefined && !isNaN(dados.peso_inicial) ? dados.peso_inicial : null},
+        ${dados.altura !== undefined && !isNaN(dados.altura) ? dados.altura : null},
+        ${dados.objetivos && dados.objetivos.length > 0 ? dados.objetivos : null},
+        ${dados.objetivo_texto || null},
+        ${dados.nivel_atividade || null},
+        ${dados.patologias && dados.patologias.length > 0 ? dados.patologias : null},
+        ${dados.restricoes_alimentares && dados.restricoes_alimentares.length > 0 ? dados.restricoes_alimentares : null},
+        ${dados.alergias && dados.alergias.length > 0 ? dados.alergias : null},
+        ${dados.medicamentos || null},
+        ${dados.suplementos || null},
+        ${dados.refeicoes_por_dia !== undefined && !isNaN(dados.refeicoes_por_dia) ? dados.refeicoes_por_dia : null},
+        ${dados.horario_acorda || null},
+        ${dados.horario_dorme || null},
+        ${dados.litros_agua !== undefined && !isNaN(dados.litros_agua) ? dados.litros_agua : null},
+        ${dados.atividade_fisica !== undefined ? dados.atividade_fisica : null},
+        ${dados.atividade_fisica_descricao || null},
+        ${dados.observacoes || null}
+      )
+      RETURNING *;
+    `;
+
+    if (!rows || rows.length === 0) {
+      throw new Error('Não foi possível salvar o paciente no Neon.');
+    }
+
+    return rows[0] as Paciente;
+  },
+
   async criarPacienteExemplo(nutricionistaId: string, email?: string): Promise<void> {
     const sql = this.getSql();
-    let resolvedNutriId = nutricionistaId;
-    if (email) {
-      const nutriRows = await sql`
-        SELECT id FROM public.nutricionistas WHERE email = ${email} OR id = ${nutricionistaId} LIMIT 1;
-      `;
-      if (nutriRows.length > 0) {
-        resolvedNutriId = nutriRows[0].id;
-      }
-    }
+    const resolvedNutriId = await this.resolveNutricionistaId(nutricionistaId, email);
 
     // Cria um paciente para teste imediato
     const paciente = await sql`
-      INSERT INTO public.pacientes (nutricionista_id, nome, email, telefone, peso_inicial, altura)
-      VALUES (${resolvedNutriId}, 'Ana Beatriz Santos', 'ana.santos@email.com', '(11) 98765-4321', 65.5, 1.68)
+      INSERT INTO public.pacientes (
+        nutricionista_id, 
+        nome, 
+        email, 
+        telefone, 
+        whatsapp,
+        peso_inicial, 
+        altura,
+        objetivos,
+        nivel_atividade
+      )
+      VALUES (
+        ${resolvedNutriId}, 
+        'Ana Beatriz Santos', 
+        'ana.santos@email.com', 
+        '(11) 98765-4321',
+        '(11) 98765-4321',
+        65.5, 
+        168,
+        ARRAY['Emagrecer', 'Reeducação alimentar'],
+        'Moderadamente ativo'
+      )
       RETURNING id;
     `;
 
     if (paciente.length > 0) {
       const pacId = paciente[0].id;
-      // Insere uma consulta antiga há 45 dias sem retorno agendado para validar o card 3
+      // Insere consulta antiga há 45 dias
       await sql`
         INSERT INTO public.consultas (paciente_id, data_consulta, peso, observacoes)
         VALUES (${pacId}, CURRENT_DATE - INTERVAL '45 days', 65.5, 'Primeira consulta de avaliação.');
       `;
-      // Insere uma consulta nesta semana para validar o card 2
+      // Insere consulta nesta semana
       await sql`
         INSERT INTO public.consultas (paciente_id, data_consulta, peso, observacoes)
         VALUES (${pacId}, CURRENT_DATE, 64.8, 'Retorno da semana.');

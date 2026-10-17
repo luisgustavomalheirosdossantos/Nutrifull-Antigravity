@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { DashboardView } from './DashboardView';
 import { PacientesListView } from './PacientesListView';
 import { PacienteDetalhes } from './PacienteDetalhes';
+import { NovoPacienteForm } from './NovoPacienteForm';
 import type { NutricionistaUser } from '../lib/auth';
 
 interface DashboardProps {
@@ -13,13 +14,27 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'pacientes'>('dashboard');
   const [selectedPacienteId, setSelectedPacienteId] = useState<string | null>(null);
+  const [isCreatingPaciente, setIsCreatingPaciente] = useState(false);
 
   const handleSelectPaciente = (pacienteId: string) => {
     setSelectedPacienteId(pacienteId);
+    setIsCreatingPaciente(false);
   };
 
   const handleBackToDashboard = () => {
     setSelectedPacienteId(null);
+    setIsCreatingPaciente(false);
+  };
+
+  const handleNovoPaciente = () => {
+    setCurrentTab('pacientes');
+    setSelectedPacienteId(null);
+    setIsCreatingPaciente(true);
+  };
+
+  const handlePacienteCadastrado = (novoPacienteId: string) => {
+    setIsCreatingPaciente(false);
+    setSelectedPacienteId(novoPacienteId);
   };
 
   return (
@@ -30,6 +45,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
         onSelectTab={(tab) => {
           setCurrentTab(tab);
           setSelectedPacienteId(null);
+          setIsCreatingPaciente(false);
         }}
         user={user}
         onLogout={onLogout}
@@ -42,6 +58,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
             pacienteId={selectedPacienteId}
             onBack={handleBackToDashboard}
           />
+        ) : isCreatingPaciente ? (
+          <NovoPacienteForm
+            user={user}
+            onSuccess={handlePacienteCadastrado}
+            onCancel={() => setIsCreatingPaciente(false)}
+          />
         ) : currentTab === 'dashboard' ? (
           <DashboardView
             user={user}
@@ -49,12 +71,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
             onNavigateToPacientes={() => {
               setCurrentTab('pacientes');
               setSelectedPacienteId(null);
+              setIsCreatingPaciente(false);
             }}
           />
         ) : (
           <PacientesListView
             user={user}
             onSelectPaciente={handleSelectPaciente}
+            onNovoPaciente={handleNovoPaciente}
           />
         )}
       </main>
